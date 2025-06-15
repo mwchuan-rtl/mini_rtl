@@ -1,0 +1,36 @@
+@startuml
+skinparam State { 
+AttributeFontColor blue 
+AttributeFontName serif 
+AttributeFontSize  9 
+AttributeFontStyle italic 
+BackgroundColor palegreen 
+BorderColor violet 
+EndColor gold 
+FontColor black 
+FontName Sanserif 
+FontSize 15 
+FontStyle bold 
+StartColor silver 
+} 
+
+[*]     --> INIT_0  : !rst_n
+
+INIT_0  --> INIT_0  : 0/0 
+INIT_0  --> DET_1   : 1/0
+
+DET_1   --> DET_01  : 0/0
+DET_1   --> DET_1   : 1/0
+
+DET_01  --> DET_101 : 1/0
+DET_01  --> INIT_0  : 0/0
+
+DET_101 --> DET_1   : 1/1
+DET_101 --> DET_01  : 0/0
+
+INIT_0  : Reset State
+DET_1   : Detected '1'
+DET_01  : Detected seq '01'
+DET_101 : Detected seq '101'
+
+@enduml
