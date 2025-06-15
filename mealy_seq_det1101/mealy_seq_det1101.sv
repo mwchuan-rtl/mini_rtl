@@ -2,7 +2,7 @@
 // File Name : mealy_seq_det1101.sv
 // Module    : Just a simple sequence detector
 // Sequence  : output a 1 when serial input 1 -> 0 -> 1 -> 1 is detected, with overlapping pattern
-// Glitches  : This design produces glitches when we have 1->0->1->0->1 pattern if the input is flopped
+// Glitches  : This design produces glitches when we have 1->0->1->0->1 pattern if the input is not flopped
 //------------------------------------------------------------------------------------------------------------------------------------
 
 ` define RSTD_MSFF(q, i, clock, rst, rstd)              \
