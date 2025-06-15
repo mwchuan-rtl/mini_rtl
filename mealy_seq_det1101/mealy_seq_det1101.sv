@@ -1,9 +1,9 @@
-//------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------------
 // File Name : mealy_seq_det1101.sv
 // Module    : Just a simple sequence detector
 // Sequence  : output a 1 when serial input 1 -> 0 -> 1 -> 1 is detected, with overlapping pattern
-// Glitches  : This design produces glitches when we have 1->0->1->0->1 pattern, why?
-//-------------------------------------------------------------------------------------------------
+// Glitches  : This design produces glitches when we have 1->0->1->0->1 pattern if the input is flopped
+//------------------------------------------------------------------------------------------------------------------------------------
 
 ` define RSTD_MSFF(q, i, clock, rst, rstd)              \
     always_ff @(posedge clock)                          \
@@ -32,17 +32,21 @@ module mealy_seq_det1101 (
     } t_enum_fsm1101;
 
     //internal signals
+    logic          in_bit_sync;
     t_enum_fsm1101 cur_state, nxt_state;
 
     `RSTD_MSFF(cur_state, nxt_state, clk, !rst_n, INIT_0)
     
+    //flopped input to overcome glitches
+    `RSTD_MSFF(in_bit_sync, in_bit, clk, !rst_n, 1'b0)
+
     always_comb begin : fsm1101_combi
         pattern_det = 1'b0;
 
         unique casez (cur_state)
             
             INIT_0  : begin
-                if (in_bit) begin
+                if (in_bit_sync) begin
                     nxt_state     = DET_1;
                     pattern_det   = 1'b0;
                 end
@@ -53,7 +57,7 @@ module mealy_seq_det1101 (
             end //INIT_0
 
             DET_1   : begin
-                if (in_bit) begin
+                if (in_bit_sync) begin
                     nxt_state     = DET_1;
                     pattern_det   = 1'b0;
                 end
@@ -64,7 +68,7 @@ module mealy_seq_det1101 (
             end //DET_1
 
             DET_01  : begin
-                if (in_bit) begin
+                if (in_bit_sync) begin
                     nxt_state     = DET_101;
                     pattern_det   = 1'b0;
                 end
@@ -75,7 +79,7 @@ module mealy_seq_det1101 (
             end //DET_01
 
             DET_101 : begin
-                if (in_bit) begin
+                if (in_bit_sync) begin
                     nxt_state     = DET_1;
                     //output a 1 when serial input 1 -> 0 -> 1 -> 1 is detected
                     pattern_det   = 1'b1;
